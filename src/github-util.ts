@@ -4,7 +4,6 @@ import { Context } from '@actions/github/lib/context';
 import { Repo } from './common';
 
 // NOTE: mostly copy-paste from github action sticky pull request
-
 function headerComment(header: string) {
   return `<!-- Sticky Pull Request Comment${header} -->`;
 }

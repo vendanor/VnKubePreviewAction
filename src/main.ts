@@ -52,7 +52,8 @@ async function run(): Promise<void> {
     helmKeyTlsSecretName: core.getInput('helm-key-tls-secret-name'),
     helmKeyClusterIssuer: core.getInput('helm-key-cluster-issuer'),
     clusterIssuer: core.getInput('cluster-issuer'),
-    TlsSecretName: core.getInput('tls-secret-name')
+    TlsSecretName: core.getInput('tls-secret-name'),
+    dockerRemovePreviewImages: core.getInput('docker-remove-preview-images')
   };
 
   try {

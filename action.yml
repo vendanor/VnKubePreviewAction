@@ -3,141 +3,145 @@ description: 'Deploy preview of Pull Requests to Azure Kubernetes Service using 
 author: 'vendanor'
 
 branding:
-  icon: "box"
-  color: "orange"
+  icon: 'box'
+  color: 'orange'
 
 inputs:
   command:
     required: true
-    default: "deploy"
-    description: "Command to run, can be deploy, remove or notify"
+    default: 'deploy'
+    description: 'Command to run, can be deploy, remove or notify'
 
   token:
-    description: "Your Github token"
+    description: 'Your Github token'
     default: $
     required: true
   docker-file:
     required: false
-    default: "Dockerfile"
-    description: "Dockerfile to build, tag with preview metadata and publish to container registry"
+    default: 'Dockerfile'
+    description: 'Dockerfile to build, tag with preview metadata and publish to container registry'
   docker-registry:
     required: false
-    default: "ghcr.io"
-    description: "Docker container registry. Defaults to Github container registry"
+    default: 'ghcr.io'
+    description: 'Docker container registry. Defaults to Github container registry'
   docker-username:
     required: false
-    description: "Username docker container registry, ghcr? github.repository_owner"
+    description: 'Username docker container registry, ghcr? github.repository_owner'
   docker-password:
     required: false
-    description: "Password docker container registry"
+    description: 'Password docker container registry'
   docker-image-name:
     required: false
-    description: "Example vn-my-app"
+    description: 'Example vn-my-app'
   docker-organization:
     required: false
-    default: "vendanor"
-    description: "Organization used to construct docker registry url"
+    default: 'vendanor'
+    description: 'Organization used to construct docker registry url'
   docker-tag-major:
     required: false
-    default: "1.0"
-    description: "Major tag used when tagging docker images, example: 1.0"
+    default: '1.0'
+    description: 'Major tag used when tagging docker images, example: 1.0'
   docker-pullsecret:
     required: false
-    description: "Docker pullsecret to use when pulling docker images from registry when deploying helm chart"
+    description: 'Docker pullsecret to use when pulling docker images from registry when deploying helm chart'
+  docker-remove-preview-images:
+    required: true
+    default: 'true'
+    description: 'Remove all preview docker images from docker container registry when calling command remove'
 
   helm-namespace:
     required: false
-    default: "vn-preview"
-    description: "Helm namespace where Helm releases are published. Also used as k8s namespace!"
+    default: 'vn-preview'
+    description: 'Helm namespace where Helm releases are published. Also used as k8s namespace!'
   helm-repo-url:
     required: false
-    description: "Helm chart repo. If supplied, Helm charts are published here"
+    description: 'Helm chart repo. If supplied, Helm charts are published here'
   helm-organization:
     required: false
-    default: "vendanor"
-    description: "Used when pushing helm chart to helm chart repo"
+    default: 'vendanor'
+    description: 'Used when pushing helm chart to helm chart repo'
   helm-repo-user:
     required: false
-    default: "vendanor"
-    description: "Username to helm chart repo if you want to publish chart"
+    default: 'vendanor'
+    description: 'Username to helm chart repo if you want to publish chart'
   helm-repo-password:
     required: false
-    description: "Helm chart repo password if you want tp publish chart"
+    description: 'Helm chart repo password if you want tp publish chart'
   helm-chart:
     required: false
-    description: "Path to helm chart in repo, example: charts/vn-my-app"
+    description: 'Path to helm chart in repo, example: charts/vn-my-app'
   helm-tag-major:
     required: true
-    default: "1.0"
-    description: "Major tag when tagging helm chart previews, example: 1.0"
+    default: '1.0'
+    description: 'Major tag when tagging helm chart previews, example: 1.0'
   helm-remove-preview-charts:
     required: true
-    default: "true"
-    description: "Remove all preview helm charts when calling command remove"
+    default: 'true'
+    description: 'Remove all preview helm charts when calling command remove'
 
   helm-key-appname:
     required: true
-    default: "appname"
-    description: "The key to set in your helm chart to set when installing preview"
+    default: 'appname'
+    description: 'The key to set in your helm chart to set when installing preview'
   helm-key-namespace:
     required: true
-    default: "namespace"
-    description: "k8s namespace key to override"
+    default: 'namespace'
+    description: 'k8s namespace key to override'
   helm-key-image:
     required: true
-    default: "image"
-    description: "The key to set in your helm chart to set when installing preview"
+    default: 'image'
+    description: 'The key to set in your helm chart to set when installing preview'
   helm-key-pullsecret:
     required: true
-    default: "pullsecret"
-    description: "The key to set in your helm chart to set when installing preview"
+    default: 'pullsecret'
+    description: 'The key to set in your helm chart to set when installing preview'
   helm-key-url:
     required: true
-    default: "url"
-    description: "The key to set in your helm chart to set when installing preview"
+    default: 'url'
+    description: 'The key to set in your helm chart to set when installing preview'
   helm-key-containersuffix:
     required: true
-    default: "containersuffix"
-    description: "The key to set in your helm chart to set when installing preview"
+    default: 'containersuffix'
+    description: 'The key to set in your helm chart to set when installing preview'
   helm-key-cluster-issuer:
     required: true
-    default: "clusterIssuer"
-    description: "The key to set in your helm chart to set when installing preview"
+    default: 'clusterIssuer'
+    description: 'The key to set in your helm chart to set when installing preview'
   helm-key-tls-secret-name:
     required: true
-    default: "tlsSecretName"
-    description: "The key to set in your helm chart to set when installing preview"
+    default: 'tlsSecretName'
+    description: 'The key to set in your helm chart to set when installing preview'
 
   # idea, use this for 1) docker image url 2) helm chart url 3) preview url?  => rename to preview-name?
   app-name:
     required: true
-    description: "App name used in preview url."
+    description: 'App name used in preview url.'
   hash-salt:
     required: false
-    default: "salt"
-    description: "Secret salt used to generate preview hash"
+    default: 'salt'
+    description: 'Secret salt used to generate preview hash'
   base-url:
     required: false
-    default: "pr.st.vendanor.com"
-    description: "Base preview url, example preview.domain.com"
+    default: 'pr.st.vendanor.com'
+    description: 'Base preview url, example preview.domain.com'
   cluster-issuer:
     required: true
     default: vn-letsencrypt-preview-issuer
-    description: "Name of cluster issuer to use"
+    description: 'Name of cluster issuer to use'
   tls-secret-name:
     required: true
     default: vn-preview-wild
-    description: "Certificate secret name. Use a shared name for wildcard certs"
+    description: 'Certificate secret name. Use a shared name for wildcard certs'
 
 outputs:
   previewUrl:
-    description: "Complete url to preview"
+    description: 'Complete url to preview'
   dockerImageVersion:
-    description: "Docker image name including tags (semver)"
+    description: 'Docker image name including tags (semver)'
   helmReleaseName:
-    description: "Helm chart release version including tags (semver)"
+    description: 'Helm chart release version including tags (semver)'
   success:
-    description: "was everthing successful or not"
+    description: 'was everthing successful or not'
 
 runs:
   using: 'node12'

@@ -34,6 +34,7 @@ export interface Options {
   helmNamespace: string;
   appName: string;
   cmd: Command | string;
+  dockerRemovePreviewImages: string;
 }
 
 export interface CommandResult {
@@ -106,7 +107,8 @@ const optionsDict: { [key in OptionKeys]: string } = {
   dockerFile: 'docker-file',
   hashSalt: 'hash-salt',
   helmKeyAppName: 'helm-key-app-name',
-  helmKeyPullSecret: 'helm-key-pullsecret'
+  helmKeyPullSecret: 'helm-key-pullsecret',
+  dockerRemovePreviewImages: 'docker-remove-preview-images'
 };
 
 export function validateOptions(

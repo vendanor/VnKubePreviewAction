@@ -1,15 +1,9 @@
-import {
-  ChartListResult,
-  CommandResult,
-  HelmListResult,
-  Options,
-  PREVIEW_TAG_PREFIX,
-  validateOptions
-} from './common';
+import { CommandResult, HelmListResult, Options } from './common';
 import * as core from '@actions/core';
 import { runCmd } from './run-cmd';
 import { getCurrentPullRequestId } from './github-util';
-import axios from 'axios';
+import { removePreviewHelmCharts } from './remove-preview-helm-charts';
+import { removePreviewDockerImages } from './remove-preview-docker-images';
 
 export const removePreviewsForCurrentPullRequest = async (
   options: Options
@@ -18,18 +12,12 @@ export const removePreviewsForCurrentPullRequest = async (
     appName,
     githubToken,
     helmNamespace,
-    helmRemovePreviewCharts,
-    helmRepoPassword,
-    helmRepoUrl,
-    helmRepoUsername
+    helmRemovePreviewCharts
   } = options;
 
   const pullRequestId = await getCurrentPullRequestId(githubToken);
   const shouldRemoveCharts: boolean =
     helmRemovePreviewCharts.toLowerCase() === 'true';
-  const regexCurrentVersion = new RegExp(
-    `\\b${PREVIEW_TAG_PREFIX}.${pullRequestId}.\\b`
-  );
 
   core.info(`Removing previews for pull request ${pullRequestId}...`);
   const cmdResult = await runCmd('helm', [
@@ -64,59 +52,18 @@ export const removePreviewsForCurrentPullRequest = async (
   }
 
   if (shouldRemoveCharts) {
-    core.info('Removing charts..');
-    validateOptions(options, 'remove', [
-      'helmRepoUrl',
-      'helmRepoUsername',
-      'helmRepoPassword',
-      'appName'
-    ]);
-
-    const url = `${helmRepoUrl}/api/charts/${appName}`;
-    core.info('Get a list of all charts for app, url: ' + url);
-    const allCharts = await axios.get<ChartListResult>(url, {
-      auth: {
-        username: helmRepoUsername,
-        password: helmRepoPassword
-      },
-      responseType: 'json'
-    });
-    core.info(
-      `Fetch list of charts: ${allCharts.status} - ${allCharts.statusText}`
-    );
-
-    // core.info('All charts');
-    // core.info(JSON.stringify(allCharts.data, null, 2));
-
-    const filteredCharts = allCharts.data.filter(
-      c => c.name === appName && regexCurrentVersion.test(c.version)
-    );
-
-    // core.info('filtered charts to delete');
-    // core.info(JSON.stringify(filteredCharts, null, 2));
-    core.info(`Found ${filteredCharts.length} preview charts to delete`);
-
-    for (let i = 0; i < filteredCharts.length; i++) {
-      const { name, version } = filteredCharts[i];
-      core.info(`Deleting chart ${version}`);
-      const deleteResult = await axios.delete(
-        `${helmRepoUrl}/api/charts/${name}/${version}`,
-        {
-          auth: {
-            username: helmRepoUsername,
-            password: helmRepoPassword
-          },
-          responseType: 'json'
-        }
-      );
-      core.info(
-        `Delete result: ${deleteResult.status} ${deleteResult.statusText}`
-      );
-    }
-
-    core.info('Done deleting helm charts');
+    await removePreviewHelmCharts(pullRequestId, options);
   } else {
-    core.info('Skip removing charts..');
+    core.info('Skip removing Helm preview charts..');
+  }
+
+  if (options.dockerRemovePreviewImages.toLowerCase() === 'true') {
+    // await removePreviewDockerImages(pullRequestId, options);
+    core.warning(
+      'Skip removing docker preview images, not supported by GHCR.io yet!'
+    );
+  } else {
+    core.info('Skip removing docker preview images.');
   }
 
   core.info(`All previews for app ${appName} deleted successfully!`);
